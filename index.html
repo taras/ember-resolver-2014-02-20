@@ -1,0 +1,229 @@
+<!--
+Google IO 2012 HTML5 Slide Template
+
+Authors: Eric Bidelman <ebidel@gmail.com>
+         Luke Mahe <lukem@google.com>
+
+URL: https://code.google.com/p/io-2012-slides
+-->
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Google IO 2012</title>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  <!--<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">-->
+  <!--<meta name="viewport" content="width=device-width, initial-scale=1.0">-->
+  <!--This one seems to work all the time, but really small on ipad-->
+  <!--<meta name="viewport" content="initial-scale=0.4">-->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <link rel="stylesheet" media="all" href="theme/css/default.css">
+  <link rel="stylesheet" media="all" href="theme/css/app.css">
+  <link rel="stylesheet" media="only screen and (max-device-width: 480px)" href="theme/css/phone.css">
+  <base target="_blank"> <!-- This amazingness opens all links in a new tab. -->
+  <script data-main="js/slides" src="js/require-1.0.8.min.js"></script>
+</head>
+<body style="opacity: 0">
+
+<slides class="layout-widescreen">
+
+<!-- <slide class="logoslide nobackground">
+  <article class="flexbox vcenter">
+    <span><img src="images/google_developers_logo.png"></span>
+  </article>
+</slide>
+ -->
+<slide class="title-slide segue nobackground">
+  <aside class="gdbar"><img src="images/ember_icon_128.png"></aside>
+  <!-- The content of this hgroup is replaced programmatically through the slide_config.json. -->
+  <hgroup class="auto-fadein">
+    <h1 data-config-title><!-- populated from slide_config.json --></h1>
+    <h2 data-config-subtitle><!-- populated from slide_config.json --></h2>
+    <p data-config-presenter><!-- populated from slide_config.json --></p>
+  </hgroup>
+</slide>
+
+
+<slide  >
+  
+    <hgroup>
+      <h2>About Me</h2>
+      <h3></h3>
+    </hgroup>
+    <article ><ul>
+<li><a href="https://github.com/rjackson">github.com/rjackson</a></li>
+<li><a href="https://twitter.com/rwjblue">twitter.com/rwjblue</a></li>
+<li>Frequent Ember.js Contributor</li>
+<li>Ember Release Management Team</li>
+<li>General Open Source Fanatic</li>
+<li>Senior Developer with <a href="http://dockyard.com">DockYard</a></li>
+</ul></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>Intro</h2>
+      <h3>What is the Resolver</h3>
+    </hgroup>
+    <article ><ul class="build">
+<li>MAGIC</li>
+<li>Looks up the code in YOUR application.</li>
+<li>It is responsible for converting a "name" in your application into the actual class/function that Ember needs.</li>
+</ul></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>Different Types of Resolver</h2>
+      <h3></h3>
+    </hgroup>
+    <article ><ul>
+<li>
+<p>The <code>Ember.DefaultResolver</code> is used with a stock Ember build. It looks up your classes &amp; templates on the main namespace global.</p>
+</li>
+<li>
+<p>The <code>ember-jj-abrams-resolver</code> is used by Ember App Kit and Ember Appkit Rails to lookup classes &amp; templates using ES6/AMD modules.</p>
+</li>
+</ul></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>`Ember.DefaultResolver`</h2>
+      <h3>How does it work for classes?</h3>
+    </hgroup>
+    <article ><pre class="prettyprint" data-lang="javascript">
+function resolve(name, type, global) {
+  var className = Ember.String.classify(name) + Ember.String.classify(type),
+      factory = Ember.get(global, className);
+
+  return factory;
+}
+
+resolve('application', 'route', App); //=> Looks up App.ApplicationRoute
+resolve('post', 'controller', App);   //=> Looks up App.PostController
+
+</pre></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>`Ember.DefaultResolver`</h2>
+      <h3>How does it work for templates?</h3>
+    </hgroup>
+    <article ><pre class="prettyprint" data-lang="javascript">
+function resolveTemplate(templateName) {
+  if (Ember.TEMPLATES[templateName]) {
+    return Ember.TEMPLATES[templateName];
+  }
+
+  templateName = Ember.String.decamelize(templateName);
+  if (Ember.TEMPLATES[templateName]) {
+    return Ember.TEMPLATES[templateName];
+  }
+}
+
+resolveTemplate('application'); //=> Looks up Ember.TEMPLATES['application']
+
+</pre></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>`ember-jj-abrams-resolver`</h2>
+      <h3>How does it work?</h3>
+    </hgroup>
+    <article ><pre class="prettyprint" data-lang="javascript">
+function resolve(prefix, type, name) {
+  var moduleName = prefix + '/' + type + 's/' + name;
+
+  return require(moduleName);
+}
+
+resolve('appkit', 'route', 'application'); //=> Looks up appkit/routes/application
+resolve('appkit', 'post', 'controller');   //=> Looks up appkit/controllers/post</article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>Customizing</h2>
+      <h3></h3>
+    </hgroup>
+    <article ><pre class="prettyprint" data-lang="javascript">
+var MyResolver = Ember.DefaultResolver.extend({
+  resolveRoute: function(){
+    return Ember.Route.extend();
+  }
+});
+
+window.App = Ember.Application.create({
+  Resolver: MyResolver
+});
+</pre></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>Where can I learn more?</h2>
+      <h3></h3>
+    </hgroup>
+    <article ><ul>
+<li>https://github.com/emberjs/ember.js/blob/master/packages/ember-application/lib/system/resolver.js</li>
+<li>https://github.com/stefanpenner/ember-jj-abrams-resolver/blob/master/packages/ember-resolver/lib/core.js</li>
+</ul></article>
+ 
+</slide>
+
+
+<slide class="thank-you-slide segue nobackground">
+  <aside class="gdbar right"><img src="images/ember_icon_128.png"></aside>
+  <article class="flexbox vleft auto-fadein">
+    <h2>&lt;Thank You!&gt;</h2>
+  </article>
+  <p class="auto-fadein" data-config-contact>
+    <!-- populated from slide_config.json -->
+  </p>
+</slide>
+
+<!-- <slide class="logoslide dark nobackground">
+  <article class="flexbox vcenter">
+    <span><img src="images/google_developers_logo_white.png"></span>
+  </article>
+</slide> -->
+
+<slide class="backdrop"></slide>
+
+</slides>
+
+<script>
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-XXXXXXXX-1']);
+_gaq.push(['_trackPageview']);
+
+(function() {
+  var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+  ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+  var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+})();
+</script>
+
+<!--[if IE]>
+  <script src="http://ajax.googleapis.com/ajax/libs/chrome-frame/1/CFInstall.min.js"></script>
+  <script>CFInstall.check({mode: 'overlay'});</script>
+<![endif]-->
+</body>
+</html>
